@@ -12,12 +12,19 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import java.net.ConnectException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Netty客户端用于订阅消息。
+ * <p>
+ * 该客户端实现了一个可重连机制，当连接失败时会自动尝试重新连接。
+ */
 @Slf4j
 public class NettySubClient {
+
 
   private final String host;
   private final int port;
   private final String name;
+  // 消息处理handler
   private final NettyMessageHandler handler;
   private boolean closed;
 
@@ -28,6 +35,11 @@ public class NettySubClient {
     this.handler = handler;
   }
 
+  /**
+   * 启动客户端。
+   * <p>
+   * 创建线程并尝试连接服务端，如果连接失败，将尝试重新连接。
+   */
   public void start() {
     closed = false;
     ThreadFactory.startThread(String.format("netty-sub-%s", name), () -> {

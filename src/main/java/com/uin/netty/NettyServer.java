@@ -63,24 +63,30 @@ public class NettyServer {
             .childHandler(new ChannelInitializer<SocketChannel>() {
               @Override
               public void initChannel(SocketChannel ch) {
+                // 添加帧解码器，用于处理固定长度的帧
                 ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 2, 0, 2));
+                // 添加自定义处理器，用于处理解码后的消息
                 ch.pipeline().addLast(new NettyHandler(handler));
               }
             })
             .option(ChannelOption.SO_BACKLOG, 128)
+            // 启用保持连接
             .childOption(ChannelOption.SO_KEEPALIVE, true);
 
         // Bind and start to accept incoming connections.
+        // 绑定端口，开始接受传入的连接
         ChannelFuture f = bootstrap.bind(port).sync();
 
         // Wait until the server socket is closed.
         // In this example, this does not happen, but you can do that to gracefully
         // shut down your server.
+        // 等待服务器套接字通道关闭
         channel = f.channel();
         channel.closeFuture().sync();
       } catch (InterruptedException e) {
         log.error("netty server caught exception", e);
       } finally {
+        // 关闭boss线程 和 worker线程
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
       }

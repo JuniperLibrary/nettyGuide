@@ -1,4 +1,4 @@
-package com.uin.netty;
+package com.uin.netty.simple;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -33,13 +33,13 @@ public class NettyBasicServerExample {
           .childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-//              socketChannel.pipeline().addLast(new NormalMessageHandler()); //添加handler，也就是具体的IO事件处理器
+              socketChannel.pipeline().addLast(new NormalMessageHandler()); //添加handler，也就是具体的IO事件处理器
             }
           });
       //由于默认情况下是NIO异步非阻塞，所以绑定端口后，通过sync()方法阻塞直到连接建立
       //绑定端口并同步等待客户端连接（sync方法会阻塞，直到整个启动过程完成）
-      ChannelFuture channelFuture=bootstrap.bind(port).sync();
-      System.out.println("Netty Server Started,Listening on :"+port);
+      ChannelFuture channelFuture = bootstrap.bind(port).sync();
+      System.out.println("Netty Server Started,Listening on :" + port);
       //等待服务端监听端口关闭
       channelFuture.channel().closeFuture().sync();
     } catch (InterruptedException e) {
