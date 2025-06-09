@@ -1,4 +1,4 @@
-package com.uin.netty;
+package com.uin.netty.work;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

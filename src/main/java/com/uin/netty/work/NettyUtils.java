@@ -1,4 +1,4 @@
-package com.uin.netty;
+package com.uin.netty.work;
 
 import com.alibaba.fastjson.JSONObject;
 import io.netty.buffer.ByteBuf;

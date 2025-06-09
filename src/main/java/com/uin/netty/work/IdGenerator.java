@@ -1,4 +1,4 @@
-package com.uin.netty;
+package com.uin.netty.work;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

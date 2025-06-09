@@ -1,7 +1,7 @@
-package com.uin.netty;
+package com.uin.netty.work;
 
 
-import static com.uin.netty.NettyMessageHandler.MAX_FRAME_SIZE;
+import static com.uin.netty.work.NettyMessageHandler.MAX_FRAME_SIZE;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;

@@ -1,4 +1,4 @@
-package com.uin.netty;
+package com.uin.netty.work;
 
 public enum ReporterType {
   CLICKHOUSE,

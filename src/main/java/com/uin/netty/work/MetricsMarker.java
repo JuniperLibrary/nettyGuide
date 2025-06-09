@@ -1,4 +1,4 @@
-package com.uin.netty;
+package com.uin.netty.work;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
