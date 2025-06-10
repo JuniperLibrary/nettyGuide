@@ -19,6 +19,7 @@ public class FileChannelCopy {
 
       while (true) {
         byteBufferInput.clear();
+        // 将 fileInputStreamChannel 中的输入流的数据写到buffer中
         int read = fileInputStreamChannel.read(byteBufferInput);
         System.out.println("read :" + read);
 
@@ -26,7 +27,9 @@ public class FileChannelCopy {
           break;
         }
 
+        // 写转读
         byteBufferInput.flip();
+        // 将 buffer 中的数据写到 channel 中
         fileOutputStreamChannel.write(byteBufferInput);
       }
     } catch (IOException e) {
