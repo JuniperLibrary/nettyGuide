@@ -1,4 +1,4 @@
-package com.uin.netty.nativeio;
+package com.uin.netty.nativeio.bio;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

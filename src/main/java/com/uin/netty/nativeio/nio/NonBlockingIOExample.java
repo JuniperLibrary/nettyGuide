@@ -1,4 +1,4 @@
-package com.uin.netty.nativeio;
+package com.uin.netty.nativeio.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -58,6 +58,7 @@ public class NonBlockingIOExample {
             ByteBuffer buffer = ByteBuffer.allocate(1024);
             // 从通道读取数据到缓冲区
             channel.read(buffer);
+            // 写模式 转读模式
             buffer.flip();
             // 处理读取的数据
           } else if (key.isWritable()) {
