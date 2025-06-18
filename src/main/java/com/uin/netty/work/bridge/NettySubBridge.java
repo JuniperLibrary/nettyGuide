@@ -1,7 +1,7 @@
 package com.uin.netty.work.bridge;
 
-import com.qit.rates.common.event.event.*;
-import com.qit.rates.common.event.netty.*;
+import com.uin.netty.work.*;
+import com.uin.netty.work.event.*;
 import io.netty.channel.*;
 import java.util.*;
 import lombok.extern.slf4j.*;

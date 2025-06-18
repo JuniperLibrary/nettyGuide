@@ -1,8 +1,8 @@
 package com.uin.netty.work.bridge;
 
 import cn.hutool.core.util.*;
-import com.qit.rates.common.event.event.*;
-import com.qit.rates.common.event.netty.*;
+import com.uin.netty.work.*;
+import com.uin.netty.work.event.*;
 import io.netty.channel.*;
 import java.util.*;
 import java.util.concurrent.*;

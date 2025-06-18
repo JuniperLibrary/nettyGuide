@@ -36,3 +36,11 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/checkstyle-idea.xml
+/.idea/encodings.xml
+/.idea/git_toolbox_prj.xml
+/.idea/misc.xml
+/.idea/sonarlint.xml
+/.idea/uiDesigner.xml
+/.idea/vcs.xml

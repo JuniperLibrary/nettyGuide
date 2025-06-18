@@ -1,6 +1,8 @@
 package com.uin.netty.work.event;
 
 import com.codahale.metrics.*;
+import com.uin.netty.work.*;
+import com.uin.netty.work.thread.*;
 import java.io.*;
 import java.util.concurrent.*;
 import lombok.*;
@@ -11,7 +13,7 @@ public abstract class AbstractEventHandler {
 
   @Getter
   @Setter
-  private boolean isOuterSendHandler=false;
+  private boolean isOuterSendHandler = false;
 
   private EventBus eventBus;
   private final LinkedBlockingQueue<Event> queue;
@@ -28,7 +30,7 @@ public abstract class AbstractEventHandler {
     this.queue = new LinkedBlockingQueue<>();
     MetricsMarker.setGauge(name, "QueueSize", (Gauge<Integer>) queue::size);
     for (int i = 0; i < n; i++) {
-      QitThreadFactory.startThread(String.format("event-handler-%s-%d", name, i), () -> {
+      WorkThreadFactory.startThread(String.format("event-handler-%s-%d", name, i), () -> {
         while (!Thread.currentThread().isInterrupted()) {
           try {
             Event event = queue.take();
@@ -63,7 +65,7 @@ public abstract class AbstractEventHandler {
     this.queue = new LinkedBlockingQueue<>();
     MetricsMarker.setGauge(name, "QueueSize", (Gauge<Integer>) queue::size);
     for (int i = 0; i < n; i++) {
-      QitThreadFactory.startThread(String.format("event-handler-%s-%d", name, i), () -> {
+      WorkThreadFactory.startThread(String.format("event-handler-%s-%d", name, i), () -> {
         while (!Thread.currentThread().isInterrupted()) {
           try {
             Event event = queue.take();
@@ -117,7 +119,7 @@ public abstract class AbstractEventHandler {
 
   public abstract void handleEvent(Event event) throws UnsupportedEncodingException;
 
-  public boolean isHbAvailableHandler(){
+  public boolean isHbAvailableHandler() {
     return true;
   }
 }

@@ -2,9 +2,8 @@ package com.uin.netty.work.bridge;
 
 import cn.hutool.core.util.*;
 import com.alibaba.fastjson.*;
-import com.qit.rates.common.event.event.*;
-import com.qit.rates.common.event.netty.*;
-import com.qit.rates.common.utils.zookeeper.*;
+import com.uin.netty.work.*;
+import com.uin.netty.work.event.*;
 import io.netty.buffer.*;
 import io.netty.channel.*;
 import java.util.*;
@@ -80,7 +79,8 @@ public class NettyPubBridge extends AbstractEventHandler implements NettyMessage
       int hashCode = event.getTopic();
       if (0 != hashCode && registerNodes.size() > 0) {
         // 根据event的哈希值从zk中获取负载处理节点
-        String nodeName = ZookeeperUtil.getServiceByHash(hashCode);
+//        String nodeName = ZookeeperUtil.getServiceByHash(hashCode);
+        String nodeName = "";
         if (StrUtil.isBlank(nodeName) || null == registerNodes.get(nodeName)) {
           log.warn("handle event write message fail,zookeeper node is null");
           return;
