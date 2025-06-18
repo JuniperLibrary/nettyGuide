@@ -1,4 +1,4 @@
-package com.uin.netty.work;
+package com.uin.netty.work.event;
 
 
 import java.util.Map;

@@ -1,6 +1,7 @@
-package com.uin.netty.work;
+package com.uin.netty.work.event;
 
 import com.alibaba.fastjson.JSONObject;
+import com.uin.netty.work.*;
 
 public class EventBuilder {
 

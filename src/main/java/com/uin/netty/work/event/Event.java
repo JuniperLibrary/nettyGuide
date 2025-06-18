@@ -1,15 +1,14 @@
-package com.uin.netty.work;
+package com.uin.netty.work.event;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.uin.netty.work.rocketmq.*;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Event {
+public class Event extends BaseMqMessage {
 
-  public static final String NETWORK_SUB="network-sub";
+  public static final String NETWORK_SUB = "network-sub";
 
   // 消息类型
   private int eventType;
