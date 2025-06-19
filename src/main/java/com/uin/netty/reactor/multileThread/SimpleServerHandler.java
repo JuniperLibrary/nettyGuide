@@ -1,4 +1,4 @@
-package com.uin.netty.reactor.singlereactor.multileThread;
+package com.uin.netty.reactor.multileThread;
 
 import io.netty.channel.*;
 import lombok.extern.slf4j.*;
