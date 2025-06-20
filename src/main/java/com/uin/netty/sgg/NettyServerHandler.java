@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 说明
- * 1. 我们自定义一个Handler 需要继续netty 规定好的某个HandlerAdapter(规范)
+ * 1. 我们自定义一个Handler 需要继承netty 规定好的某个HandlerAdapter(规范)
  * 2. 这时我们自定义一个Handler , 才能称为一个handler
  */
 @Slf4j
