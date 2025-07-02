@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Vue 聊天</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+  <style>
+    body { font-family: Arial; display: flex; gap: 20px; padding: 20px; }
+    #app { display: flex; gap: 20px; }
+    .users { min-width: 150px; border-right: 1px solid #ccc; padding-right: 10px; }
+    .chat { flex: 1; }
+    .log { white-space: pre-wrap; height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    .user { cursor: pointer; color: blue; }
+    .user:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="users">
+    <h4>在线用户</h4>
+    <ul>
+      <li v-for="user in users" :key="user" class="user" @click="mention(user)">
+        {{ user }}
+      </li>
+    </ul>
+  </div>
+  <div class="chat">
+    <div>
+      <label>用户名：</label>
+      <input v-model="username" placeholder="请输入用户名">
+      <button @click="login">登录</button>
+    </div>
+
+    <div class="log">
+      <div v-for="(item, index) in logs" :key="index">{{ item }}</div>
+    </div>
+
+
+    <input v-model="message" placeholder="输入消息" @keyup.enter="send">
+    <button @click="send">发送</button>
+  </div>
+</div>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      ws: null,
+      username: '',
+      message: '',
+      logs: [],
+      users: []
+    },
+    methods: {
+      login() {
+        if (!this.username) return alert('请输入用户名');
+        this.ws = new WebSocket('ws://localhost:8080/chat');
+        this.ws.onopen = () => {
+          this.ws.send('login@' + this.username);
+        };
+        this.ws.onmessage = (e) => {
+          const msg = e.data;
+          if (msg.startsWith('__userlist__')) {
+            this.users = msg.replace('__userlist__', '').split(',').filter(Boolean);
+          } else {
+            this.logs.push(msg); // ✅ 将每条消息作为一条记录添加
+          }
+        };
+        ;
+        this.ws.onclose = () => {
+          this.log += '[系统] 已断开连接\n';
+          this.users = [];
+        };
+      },
+      send() {
+        if (this.message && this.ws) {
+          this.ws.send(this.message);
+          this.message = '';
+        }
+      },
+      mention(user) {
+        if (user === this.username) return;
+        this.message = `@${user}:`;
+      }
+    }
+  });
+</script>
+</body>
+</html>
