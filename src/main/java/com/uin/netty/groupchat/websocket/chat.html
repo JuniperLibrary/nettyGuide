@@ -1,17 +1,66 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <title>Vue 聊天</title>
+  <meta charset="UTF-8" />
+  <title>Vue 聊天消息类型+样式示例</title>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
   <style>
-    body { font-family: Arial; display: flex; gap: 20px; padding: 20px; }
-    #app { display: flex; gap: 20px; }
+    body { font-family: Arial; margin: 20px; }
+    #app { max-width: 700px; margin: auto; display: flex; gap: 20px; }
     .users { min-width: 150px; border-right: 1px solid #ccc; padding-right: 10px; }
-    .chat { flex: 1; }
-    .log { white-space: pre-wrap; height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
-    .user { cursor: pointer; color: blue; }
-    .user:hover { text-decoration: underline; }
+    .chat { flex: 1; display: flex; flex-direction: column; }
+    .log {
+      flex: 1;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+      height: 300px;
+      background: #f9f9f9;
+    }
+    .message {
+      margin-bottom: 6px;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+    .message.chat {
+      background-color: #e1f5fe;
+    }
+    .message.private {
+      background-color: #ffe0b2;
+      font-style: italic;
+    }
+    .message.system {
+      color: #666;
+      font-size: 0.9em;
+      text-align: center;
+    }
+    .timestamp {
+      font-size: 0.8em;
+      color: #999;
+      margin-left: 8px;
+    }
+    .user {
+      cursor: pointer;
+      color: blue;
+      margin-bottom: 4px;
+    }
+    .user:hover {
+      text-decoration: underline;
+    }
+    input, button {
+      padding: 6px;
+      font-size: 1em;
+    }
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .input-row input {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -24,20 +73,45 @@
       </li>
     </ul>
   </div>
+
   <div class="chat">
-    <div>
-      <label>用户名：</label>
-      <input v-model="username" placeholder="请输入用户名">
-      <button @click="login">登录</button>
+    <div class="input-row">
+      <input v-model="username" placeholder="请输入用户名" :disabled="connected" @keyup.enter="login" />
+      <button @click="login" :disabled="connected">登录</button>
     </div>
 
-    <div class="log">
-      <div v-for="(item, index) in logs" :key="index">{{ item }}</div>
+    <div class="log" ref="logContainer">
+      <div v-for="(msg, idx) in logs" :key="idx"
+           :class="['message', msg.type]">
+        <template v-if="msg.type === 'system'">
+          {{ msg.content }}
+        </template>
+        <template v-else>
+          <strong>{{ msg.from }}:</strong> {{ msg.content }}
+          <span class="timestamp">{{ msg.time }}</span>
+        </template>
+      </div>
     </div>
 
+    <div style="position: relative;">
+      <input v-model="message"
+             placeholder="输入消息"
+             @keyup.enter="send"
+             @input="onInput"
+             :disabled="!connected"
+             ref="inputBox"
+      />
 
-    <input v-model="message" placeholder="输入消息" @keyup.enter="send">
-    <button @click="send">发送</button>
+      <ul v-if="showUserDropdown"
+          style="position: absolute; left:0; top: 28px; background:#fff; border:1px solid #ccc; list-style:none; padding:0; margin:0; max-height:120px; overflow-y:auto; width: 200px; z-index: 10;">
+        <li v-for="user in filteredUsers"
+            :key="user"
+            @click="chooseUser(user)"
+            style="padding:5px; cursor:pointer;">
+          {{ user }}
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
 
@@ -49,31 +123,72 @@
       username: '',
       message: '',
       logs: [],
-      users: []
+      users: [],
+      connected: false,
+      showUserDropdown: false,
+      filteredUsers: [],
     },
     methods: {
+      onInput(e) {
+        const val = e.target.value;
+        const pos = e.target.selectionStart;
+        // 判断光标前最近的@符号
+        const atIndex = val.lastIndexOf('@', pos - 1);
+        if (atIndex >= 0) {
+          // @后面有没有字符
+          const keyword = val.substring(atIndex + 1, pos).toLowerCase();
+          // 过滤用户列表
+          this.filteredUsers = this.users.filter(u => u.toLowerCase().includes(keyword));
+          this.showUserDropdown = this.filteredUsers.length > 0;
+        } else {
+          this.showUserDropdown = false;
+        }
+      },
+      chooseUser(user) {
+        const input = this.$refs.inputBox;
+        const val = input.value;
+        const pos = input.selectionStart;
+        const atIndex = val.lastIndexOf('@', pos - 1);
+        if (atIndex >= 0) {
+          // 替换 @后到光标位置之间的内容为选中的用户名 + ':'
+          const before = val.substring(0, atIndex + 1);
+          const after = val.substring(pos);
+          const newVal = before + user + ':' + after;
+          this.message = newVal;
+          this.showUserDropdown = false;
+
+          this.$nextTick(() => {
+            // 光标移动到冒号后面
+            const newPos = before.length + user.length + 1;
+            input.setSelectionRange(newPos, newPos);
+            input.focus();
+          });
+        }
+      },
       login() {
         if (!this.username) return alert('请输入用户名');
         this.ws = new WebSocket('ws://localhost:8080/chat');
         this.ws.onopen = () => {
           this.ws.send('login@' + this.username);
+          this.connected = true;
+          this.addSystemMessage('已连接服务器，欢迎 ' + this.username);
         };
         this.ws.onmessage = (e) => {
           const msg = e.data;
           if (msg.startsWith('__userlist__')) {
             this.users = msg.replace('__userlist__', '').split(',').filter(Boolean);
           } else {
-            this.logs.push(msg); // ✅ 将每条消息作为一条记录添加
+            this.parseMessage(msg);
           }
         };
-        ;
         this.ws.onclose = () => {
-          this.log += '[系统] 已断开连接\n';
+          this.addSystemMessage('已断开连接');
+          this.connected = false;
           this.users = [];
         };
       },
       send() {
-        if (this.message && this.ws) {
+        if (this.message && this.ws && this.connected) {
           this.ws.send(this.message);
           this.message = '';
         }
@@ -81,6 +196,82 @@
       mention(user) {
         if (user === this.username) return;
         this.message = `@${user}:`;
+      },
+      addSystemMessage(text) {
+        this.logs.push({
+          type: 'system',
+          content: '[系统] ' + text,
+          time: this.getNowTime(),
+          from: '',
+        });
+        this.scrollToBottom();
+      },
+      parseMessage(raw) {
+        // 解析服务端消息格式，比如：
+        // 私聊格式: "[私聊] 来自 张三: 你好"
+        // 群聊格式: "[群聊] 张三: 大家好"
+        // 你可以根据你服务器实际消息格式来调整解析规则
+        const time = this.getNowTime();
+
+        let logItem = {
+          type: 'chat',
+          from: '',
+          content: raw,
+          time,
+        };
+
+        if (raw.startsWith('[私聊] 来自 ')) {
+          // 私聊消息
+          // 格式例：[私聊] 来自 张三: 你好
+          const match = raw.match(/^\[私聊\] 来自 (.+?): (.+)$/);
+          if (match) {
+            logItem.type = 'private';
+            logItem.from = match[1];
+            logItem.content = match[2];
+          }
+        } else if (raw.startsWith('[群聊] ')) {
+          // 群聊消息
+          // 格式例：[群聊] 张三: 大家好
+          const match = raw.match(/^\[群聊\] (.+?): (.+)$/);
+          if (match) {
+            logItem.type = 'chat';
+            logItem.from = match[1];
+            logItem.content = match[2];
+          }
+        } else if (raw.startsWith('[你 -> ')) {
+          // 自己发的私聊消息
+          // 格式例：[你 -> 李四] 你好
+          const match = raw.match(/^\[你 -> (.+?)\] (.+)$/);
+          if (match) {
+            logItem.type = 'private';
+            logItem.from = '你';
+            logItem.content = match[2];
+          }
+        } else if (raw.startsWith('[你]: ')) {
+          // 自己发的群聊消息格式
+          // 格式例：[你]: 大家好
+          logItem.type = 'chat';
+          logItem.from = '你';
+          logItem.content = raw.substring(5);
+        } else {
+          // 其它，按系统消息处理
+          logItem.type = 'system';
+          logItem.content = raw;
+          logItem.from = '';
+        }
+
+        this.logs.push(logItem);
+        this.scrollToBottom();
+      },
+      getNowTime() {
+        const d = new Date();
+        return d.toLocaleTimeString();
+      },
+      scrollToBottom() {
+        this.$nextTick(() => {
+          const container = this.$refs.logContainer;
+          container.scrollTop = container.scrollHeight;
+        });
       }
     }
   });

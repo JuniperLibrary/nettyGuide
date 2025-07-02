@@ -23,6 +23,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
       channel.attr(USERNAME).set(username);
       userChannelMap.put(username, channel);
       channel.writeAndFlush(new TextWebSocketFrame("登录成功，欢迎 " + username));
+      broadcastUserList();
       return;
     }
 
@@ -45,14 +46,16 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
     // 私聊
     if (msg.startsWith("@")) {
       String[] parts = msg.split(":", 2);
-      String targetUser = parts[0].substring(1);
+      String targetUser = parts[0].substring(1).trim(); // 去掉@，trim空格
       String content = parts.length > 1 ? parts[1] : "";
 
       Channel targetChannel = userChannelMap.get(targetUser);
       if (targetChannel != null) {
         targetChannel.writeAndFlush(
             new TextWebSocketFrame("[私聊] 来自 " + sender + ": " + content));
-        channel.writeAndFlush(new TextWebSocketFrame("[你 -> " + targetUser + "] " + content));
+        if (targetChannel != channel) {  // 只有对方不是自己才发给自己私聊消息确认
+          channel.writeAndFlush(new TextWebSocketFrame("[你 -> " + targetUser + "] " + content));
+        }
       } else {
         channel.writeAndFlush(new TextWebSocketFrame("用户 " + targetUser + " 不在线"));
       }
