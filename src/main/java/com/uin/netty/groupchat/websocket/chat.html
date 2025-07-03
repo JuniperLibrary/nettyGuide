@@ -127,9 +127,63 @@
       connected: false,
       showUserDropdown: false,
       filteredUsers: [],
+      reconnectTimer: null,
+      reconnectAttempts: 0,
+      maxReconnect: 5,
       heartbeatTimer: null,
     },
     methods: {
+      connect() {
+        this.ws = new WebSocket('ws://localhost:8080/chat');
+
+        this.ws.onopen = () => {
+          this.ws.send('login@' + this.username);
+          this.connected = true;
+          this.reconnectAttempts = 0;
+          this.addSystemMessage('连接成功');
+
+          // 启动心跳
+          this.heartbeatTimer = setInterval(() => {
+            if (this.ws.readyState === WebSocket.OPEN) {
+              this.ws.send('__ping__');
+            }
+          }, 5000);
+        };
+
+        this.ws.onmessage = (e) => {
+          const msg = e.data;
+          if (msg.startsWith('__userlist__')) {
+            this.users = msg.replace('__userlist__', '').split(',').filter(Boolean);
+          } else {
+            this.parseMessage(msg);
+          }
+        };
+
+        this.ws.onclose = () => {
+          this.connected = false;
+          this.addSystemMessage('连接断开，准备重连...');
+          this.tryReconnect();
+        };
+
+        this.ws.onerror = (e) => {
+          console.error('WebSocket 错误:', e);
+          this.ws.close(); // 强制触发 onclose
+        };
+      },
+
+      tryReconnect() {
+        if (this.reconnectAttempts >= this.maxReconnect) {
+          this.addSystemMessage('重连失败，请刷新页面或手动重试');
+          return;
+        }
+
+        this.reconnectAttempts++;
+        this.reconnectTimer = setTimeout(() => {
+          this.addSystemMessage(`第 ${this.reconnectAttempts} 次重连...`);
+          this.connect();
+        }, 3000); // 每次重连间隔 3 秒
+      },
+
       onInput(e) {
         const val = e.target.value;
         const pos = e.target.selectionStart;
@@ -168,34 +222,13 @@
       },
       login() {
         if (!this.username) return alert('请输入用户名');
-        this.ws = new WebSocket('ws://localhost:8080/chat');
-        this.ws.onopen = () => {
-          this.ws.send('login@' + this.username);
-          this.connected = true;
-          this.addSystemMessage('已连接服务器，欢迎 ' + this.username);
-        };
-        this.ws.onmessage = (e) => {
-          const msg = e.data;
-          if (msg.startsWith('__userlist__')) {
-            this.users = msg.replace('__userlist__', '').split(',').filter(Boolean);
-          } else {
-            this.parseMessage(msg);
-          }
-        };
-        this.ws.onclose = () => {
-          this.addSystemMessage('已断开连接');
-          this.connected = false;
-          this.users = [];
-        };
-        this.heartbeatTimer = setInterval(() => {
-          if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send("__ping__");
-          }
-        },5000)
+        this.connect();
       },
       beforeDestroy() {
-        if (this.heartbeatTimer){
-          clearInterval(this.heartbeatTimer);
+        clearInterval(this.heartbeatTimer);
+        clearTimeout(this.reconnectTimer);
+        if (this.ws) {
+          this.ws.close();
         }
       },
       send() {
