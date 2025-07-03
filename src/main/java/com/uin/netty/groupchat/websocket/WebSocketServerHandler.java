@@ -16,6 +16,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
   @Override
   protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame frame) {
     String msg = frame.text();
+    if ("__ping__".equals(msg)) {
+      // 可记录最近活跃时间或直接忽略
+      return;
+    }
     Channel channel = ctx.channel();
 
     if (msg.startsWith("login@")) {
@@ -41,7 +45,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
       channel.writeAndFlush(new TextWebSocketFrame(userList.toString()));
       return;
     }
-
 
     // 私聊
     if (msg.startsWith("@")) {

@@ -127,6 +127,7 @@
       connected: false,
       showUserDropdown: false,
       filteredUsers: [],
+      heartbeatTimer: null,
     },
     methods: {
       onInput(e) {
@@ -186,6 +187,16 @@
           this.connected = false;
           this.users = [];
         };
+        this.heartbeatTimer = setInterval(() => {
+          if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send("__ping__");
+          }
+        },5000)
+      },
+      beforeDestroy() {
+        if (this.heartbeatTimer){
+          clearInterval(this.heartbeatTimer);
+        }
       },
       send() {
         if (this.message && this.ws && this.connected) {
