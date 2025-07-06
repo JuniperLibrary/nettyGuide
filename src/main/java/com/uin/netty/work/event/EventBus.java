@@ -3,7 +3,7 @@ package com.uin.netty.work.event;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
-import org.springframework.stereotype.*;
+import org.springframework.stereotype.Component;
 
 @Component
 public class EventBus {

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_package = "com.uin.netty.proto";
+option java_outer_classname = "MessageProto";
+
+message MyMessage {
+  int32 id = 1;
+  string content = 2;
+}
+
+// protoc --java_out=. my_message.proto
