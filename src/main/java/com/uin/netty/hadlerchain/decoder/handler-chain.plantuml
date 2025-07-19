@@ -1,0 +1,24 @@
+@startuml
+title Netty Handler 调用机制示意图
+
+participant Socket as "socket\n二进制字节码"
+participant Pipeline as "ChannelPipeline"
+participant Decoder as "ToIntegerDecoder\n(ByteToMessageDecoder)"
+participant Business as "业务逻辑 Handler"
+
+Socket -> Pipeline : 二进制字节写入 ByteBuf
+activate Pipeline
+
+Pipeline -> Decoder : ByteBuf → decode(...)
+activate Decoder
+
+Decoder -> Decoder : 提取完整整数（比如 124, 267）
+Decoder -> Pipeline : out.add(124), out.add(267)
+deactivate Decoder
+
+Pipeline --> Business : 124
+Pipeline --> Business : 267
+
+deactivate Pipeline
+
+@enduml
