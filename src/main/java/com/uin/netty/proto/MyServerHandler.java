@@ -13,7 +13,7 @@ public class MyServerHandler extends SimpleChannelInboundHandler<MessageProto.My
     // 构造响应消息
     MessageProto.MyMessage response = MessageProto.MyMessage.newBuilder()
         .setId(msg.getId() + 1000)
-        .setContent("\n服务端已收到: " + msg.getContent())
+        .setContent("服务端已收到: " + msg.getContent())
         .build();
     ctx.writeAndFlush(response);
   }

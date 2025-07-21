@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+
+option java_outer_classname = "MultiProto";
+
+message User {
+  int32 id = 1;
+  string name = 2;
+}
+
+message Product {
+  int32 id = 1;
+  string name = 2;
+  double price = 3;
+}
+
+// 支持传输 User 或 Product
+message Item {
+  oneof payload {
+    User user = 1;
+    Product product = 2;
+  }
+}
+
+message ItemList {
+  repeated Item items = 1;
+}

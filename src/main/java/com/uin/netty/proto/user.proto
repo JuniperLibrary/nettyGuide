@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.uin.netty.proto"; // Java包名
+option java_outer_classname = "UserProto";    // 外部类名
+
+message User {
+  int32 id = 1;
+  string name = 2;
+}
+
+message UserList {
+  repeated User users = 1;
+}
