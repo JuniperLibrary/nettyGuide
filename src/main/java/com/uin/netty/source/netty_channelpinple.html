@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>双向链表动画演示</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f9f9f9;
+      padding: 40px;
+    }
+
+    h2 {
+      color: #333;
+      text-align: center;
+    }
+
+    #list {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    .node {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      position: relative;
+      transition: transform 0.5s ease;
+      font-weight: bold;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .node.head {
+      background-color: #2196F3;
+    }
+
+    .node.tail {
+      background-color: #FF9800;
+    }
+
+    .arrow {
+      width: 40px;
+      height: 24px;
+    }
+
+    .arrow path {
+      stroke: #888;
+      stroke-width: 2;
+      fill: none;
+      marker-end: url(#arrowhead);
+    }
+
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #2196F3;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #1976D2;
+    }
+  </style>
+</head>
+<body>
+<h2>模拟 addLast0(newCtx) 的插入过程</h2>
+
+<div id="list">
+  <div class="node head">head</div>
+  <svg class="arrow"><use href="#doubleArrow"/></svg>
+  <div class="node tail">tail</div>
+</div>
+
+<button onclick="addNewNode()">添加 newCtx 节点</button>
+
+<!-- SVG箭头定义 -->
+<svg style="display:none">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#888" />
+    </marker>
+
+    <g id="doubleArrow">
+      <path d="M0 10 L35 10" />
+      <path d="M35 14 L0 14" />
+    </g>
+  </defs>
+</svg>
+
+<script>
+  let count = 1;
+  function addNewNode() {
+    const list = document.getElementById("list");
+    const nodes = list.querySelectorAll(".node");
+    const tail = nodes[nodes.length - 1];
+
+    // 新建节点
+    const newNode = document.createElement("div");
+    newNode.className = "node";
+    newNode.textContent = "newCtx" + count++;
+
+    // 插入箭头
+    const arrow = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    arrow.setAttribute("class", "arrow");
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    use.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#doubleArrow");
+    arrow.appendChild(use);
+
+    // 插入新节点和箭头（插入到 tail 前面）
+    list.insertBefore(arrow, tail);
+    list.insertBefore(newNode, arrow);
+  }
+</script>
+</body>
+</html>

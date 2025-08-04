@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Netty 启动流程动画</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6fa;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      margin: 10px 0;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+      width: 500px;
+    }
+
+    .step.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .step span {
+      font-weight: bold;
+      font-size: 16px;
+      color: #1e88e5;
+      margin-right: 10px;
+    }
+
+    .arrow {
+      font-size: 24px;
+      color: #9e9e9e;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<h2>🚀 Netty 启动流程动画演示</h2>
+<div class="container" id="flow">
+  <div class="step"><span>1️⃣</span> 创建 ServerBootstrap 实例</div>
+  <div class="arrow">⬇️</div>
+  <div class="step"><span>2️⃣</span> 设置 bossGroup 和 workerGroup</div>
+  <div class="arrow">⬇️</div>
+  <div class="step"><span>3️⃣</span> 配置服务端 Channel 类型（如 NioServerSocketChannel）</div>
+  <div class="arrow">⬇️</div>
+  <div class="step"><span>4️⃣</span> 初始化 childHandler（ChannelInitializer）</div>
+  <div class="arrow">⬇️</div>
+  <div class="step"><span>5️⃣</span> 绑定端口并同步等待 ChannelFuture</div>
+  <div class="arrow">⬇️</div>
+  <div class="step"><span>6️⃣</span> 等待 Channel 关闭（sync closeFuture）</div>
+  <div class="arrow">⬇️</div>
+  <div class="step"><span>7️⃣</span> 优雅关闭 EventLoopGroup</div>
+</div>
+
+<script>
+  const steps = document.querySelectorAll(".step");
+  steps.forEach((step, index) => {
+    setTimeout(() => {
+      step.classList.add("active");
+    }, index * 800);
+  });
+</script>
+</body>
+</html>
